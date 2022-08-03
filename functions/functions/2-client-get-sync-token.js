@@ -63,37 +63,7 @@ exports.handler = async (context, event, callback) => {
   });
   token.addGrant(syncGrant);
 
-  if (!document.data.task) {
-    // Create a task for agents
-    const attributes = {
-      type: "video", // Any attribute we want for the task (customer name, topic, page visited, ....?)
-      syncDocument: document.sid, // We provide the document SID to the agent so he can get the meeting details.
-    };
-
-    const task_created = await client.taskrouter
-      .workspaces(context.TASKROUTER_WORKSPACE_SID)
-      .tasks.create({
-        taskChannel: "video",
-        workflowSid: context.TASKROUTER_VIDEO_WORKFLOW_SID,
-        attributes: JSON.stringify(attributes),
-      })
-      .then((task) => ({ ...document.data, task: task.sid }))
-      .then((new_document_data) =>
-        client.sync
-          .services(context.SYNC_SERVICE_SID)
-          .documents(document.sid)
-          .update({ data: new_document_data })
-      )
-      .catch((reason) => false);
-
-    if (!task_created) {
-      response.setStatusCode(503);
-      response.setBody({ error: `Error contacting an agent.` });
-      return callback(null, response);
-    }
-  }
-
-  // The task has been created, we respond to the client with his identity and his token
+  // Respond to the client with his identity and his token
   // With those the Frontend JS can subscribe to the SYNC document and get notified when the agent connects.
   response.setBody({ token: token.toJwt() });
   return callback(null, response);

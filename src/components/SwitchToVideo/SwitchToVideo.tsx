@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Actions, TaskContext } from "@twilio/flex-ui";
+import { Actions, Manager, TaskContext } from "@twilio/flex-ui";
+import * as Flex from "@twilio/flex-ui";
 import { Flex as FlexComponent } from "@twilio-paste/core/flex";
 import { Button } from "@twilio-paste/core/button";
 import { Theme } from "@twilio-paste/core/theme";
@@ -17,31 +18,36 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   //   console.log(flex);
   //   console.log(task._task);
-  const onClick = (channelSid: string | undefined, context: any) => {
-    console.log(channelSid);
-    console.log(context);
-    //setIsLoading(true);
-
+  const onClick = async (channelSid: string | undefined, context: any) => {
+    // console.log(channelSid);
+    // console.log(context);
+    setIsLoading(true);
     console.log("video button clicked", process.env.REACT_APP_VIDEO_APP_URL);
+    const taskSid = context.task._task.sid;
+    const taskAttributes = context.task._task.attributes;
+    console.log("taskSid", taskSid);
+    console.log("taskAttributes", taskAttributes);
+    fetch(
+      `${process.env.REACT_APP_VIDEO_APP_URL}/1-generate-unique-code?taskSid=${taskSid}`
+    )
+      .then((response) => response.json())
+      .then((response) => {
+        console.log("SwitchToVideo: unique link created:", response);
+        console.log(task.attributes);
+        return Actions.invokeAction("SendMessage", {
+          body: `Please join me using this unique video link: ${response.full_url}`,
+          conversationSid: channelSid,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-    // Theoretically, the below code should send a message to the current chat task channel
-    flex.Actions.invokeAction("SendMessage", {
-      body: `Test...`,
-      channelSid: channelSid,
+    let attributes = task.attributes;
+    let updatedAttributes = Object.assign(attributes, {
+      videoRoom: "created",
     });
-
-    // fetch(`${process.env.REACT_APP_VIDEO_APP_URL}/1-generate-unique-code`)
-    //   .then((response) => response.json())
-    //   .then((response) => {
-    //     console.log("SwitchToVideo: unique link created:", response);
-    //     return Actions.invokeAction("SendMessage", {
-    //       body: `Please join me using this unique video link: ${response.full_url}`,
-    //       channelSid: channelSid,
-    //     });
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+    task.setAttributes(updatedAttributes);
   };
 
   return (
@@ -56,8 +62,8 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
             >
               <Button
                 variant="primary"
-                onClick={() =>
-                  onClick(context.conversation?.source?.sid, context)
+                onClick={async () =>
+                  await onClick(context.conversation?.source?.sid, context)
                 }
                 loading={isLoading}
               >

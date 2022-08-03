@@ -3,13 +3,15 @@ const randomstring = require("randomstring");
 exports.handler = async (context, event, callback) => {
   const client = context.getTwilioClient();
   const response = new Twilio.Response();
+  const { taskSid } = event;
+
   response.appendHeader("Access-Control-Allow-Origin", "*");
   response.appendHeader("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
   response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
   response.appendHeader("Content-Type", "application/json");
 
   // Note: we don't create the video room yet, because it has only a 5-min TTL if no one connects to it.
-  const video_room_name = randomstring.generate();
+  // const video_room_name = randomstring.generate();
 
   // Generate a short unique id for the client-facing url
   // We create a SYNC document to store the data about this request.
@@ -27,12 +29,30 @@ exports.handler = async (context, event, callback) => {
         uniqueName: unique_code,
         ttl: context.CODE_TTL,
         data: {
-          task: null, // Will be filled-in when the client connects and a task is created to assign an agent
+          task: taskSid,
           room: null, // Will be filled-in when the agent connects and opens the Video room
         },
       })
       .catch((reason) => null);
   }
+
+  // Update task attributes to have the syncDocument data
+  const current_task = await client.taskrouter
+    .workspaces(context.TASKROUTER_WORKSPACE_SID)
+    .tasks(taskSid)
+    .fetch();
+
+  const current_attributes = JSON.parse(current_task.attributes);
+
+  current_attributes.syncDocument = document.sid;
+
+  await client.taskrouter
+    .workspaces(context.TASKROUTER_WORKSPACE_SID)
+    .tasks(taskSid)
+    .update({
+      attributes: JSON.stringify(current_attributes),
+    })
+    .then((task) => console.log(task.attributes));
 
   // Respond with the unique code for the client-facing URL.
   response.setBody({

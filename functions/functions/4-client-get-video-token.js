@@ -53,6 +53,7 @@ exports.handler = async (context, event, callback) => {
     context.TWILIO_API_SECRET,
     { identity: client_identity }
   );
+
   // Authorize the client Frontend to connect to VIDEO
   const videoGrant = new VideoGrant({
     room: room_name,

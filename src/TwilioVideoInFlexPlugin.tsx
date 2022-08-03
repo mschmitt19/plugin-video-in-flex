@@ -3,6 +3,7 @@ import * as Flex from "@twilio/flex-ui";
 import { FlexPlugin } from "@twilio/flex-plugin";
 
 import SwitchToVideo from "./components/SwitchToVideo/SwitchToVideo";
+import IncomingVideoComponent from "./components/IncomingVideoComponent/IncomingVideoComponent";
 
 const PLUGIN_NAME = "TwilioVideoInFlexPlugin";
 
@@ -18,17 +19,21 @@ export default class TwilioVideoInFlexPlugin extends FlexPlugin {
    * @param flex { typeof Flex }
    */
   async init(flex: typeof Flex, manager: Flex.Manager): Promise<void> {
-    const options: Flex.ContentFragmentProps = { sortOrder: -1 };
-    //flex.AgentDesktopView.Panel1.Content.add(<CustomTaskList key="TwilioVideoInFlexPlugin-component" />, options);
-    // add the Agent "switch to video" button
-    // flex.TaskCanvasHeader.Content.add(
-    //   <SwitchToVideo key="video" flex={flex} />
-    // );
-    flex.CRMContainer.Content.add(<SwitchToVideo key="video" flex={flex} />);
+    const incomingVideoOptions = {
+      sortOrder: 10,
+      if: (props: any) => props.task.attributes.videoRoom === "created",
+    };
 
-    // flex.Actions.invokeAction("SendMessage", {
-    //   body: `Test...`,
-    //   channelSid: "CH5fc468e74bbb4024a8a66489e92c52d9",
-    // });
+    flex.TaskCanvasTabs.Content.add(
+      <Flex.Tab label="Video Room" key="IncomingVideoComponent">
+        <IncomingVideoComponent manager={manager} inSupervisor={false} />
+      </Flex.Tab>,
+      incomingVideoOptions
+    );
+
+    // add the Agent "switch to video" button
+    flex.TaskCanvasHeader.Content.add(
+      <SwitchToVideo key="video" flex={flex} />
+    );
   }
 }

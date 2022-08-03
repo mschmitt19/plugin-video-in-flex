@@ -96,6 +96,11 @@ function connect_video() {
         });
 
         const remoteMedia = document.getElementById("remote-media-div");
+        const localMedia = document.getElementById("local-media-div");
+
+        // add local media
+        const tracks = Array.from(localParticipant.tracks.values());
+        this.attachTracks(tracks, localMedia);
 
         // add existing participant tracks
         room.participants.forEach((participant) => {
