@@ -6,10 +6,10 @@ import { Flex as FlexPaste } from "@twilio-paste/core/flex";
 import { Theme } from "@twilio-paste/core/theme";
 import { Tooltip } from "@twilio-paste/core/tooltip";
 import { Box } from "@twilio-paste/core/box";
+import { Heading } from "@twilio-paste/core/heading";
 
 import { VideoOnIcon } from "@twilio-paste/icons/esm/VideoOnIcon";
 import { VideoOffIcon } from "@twilio-paste/icons/esm/VideoOffIcon";
-import { LinkExternalIcon } from "@twilio-paste/icons/esm/LinkExternalIcon";
 import { MicrophoneOnIcon } from "@twilio-paste/icons/esm/MicrophoneOnIcon";
 import { MicrophoneOffIcon } from "@twilio-paste/icons/esm/MicrophoneOffIcon";
 import { CloseIcon } from "@twilio-paste/icons/esm/CloseIcon";
@@ -55,7 +55,7 @@ const IncomingVideoComponent: React.FunctionComponent<
     console.log("IncomingVideoComponent: useEffect");
     if (!activeRoom && !connecting) {
       console.log("IncomingVideoComponent: Should connect to Video Room");
-      connectVideo();
+      //connectVideo();
     }
   }, []);
 
@@ -102,37 +102,20 @@ const IncomingVideoComponent: React.FunctionComponent<
       if (track.track) track = track.track;
       if (!track.attach) return;
       let trackDom = track.attach();
-      trackDom.style.width = "auto";
-      //   trackDom.style.position = "absolute";
-      //   trackDom.style.top = "60px";
-      //   trackDom.style.left = "10px";
+      trackDom.style.width = "100%";
+      trackDom.style["max-height"] = "100%";
       document.getElementById("remote-media")?.appendChild(trackDom);
     });
   }
 
   function attachLocalTracks(tracks: any, container: any) {
-    if (!inSupervisor) {
-      tracks.forEach(function (track: any) {
-        if (track.track) track = track.track;
-        let trackDom = track.attach();
-        trackDom.style.maxWidth = "100%";
-        trackDom.style["max-height"] = "150px";
-        //trackDom.style.top = "200px";
-        //trackDom.style.right = "0px";
-
-        //trackDom.style.position = "relative";
-        document.getElementById("local-media")?.appendChild(trackDom);
-      });
-    } else {
-      tracks.forEach(function (track: any) {
-        if (track.track) track = track.track;
-        let trackDom = track.attach();
-        trackDom.style.width = "100%";
-        trackDom.style["max-height"] = "100px";
-        //container.appendChild(trackDom);
-        document.getElementById("local-media")?.appendChild(trackDom);
-      });
-    }
+    tracks.forEach(function (track: any) {
+      if (track.track) track = track.track;
+      let trackDom = track.attach();
+      trackDom.style.maxWidth = "100%";
+      trackDom.style["height"] = "200px";
+      document.getElementById("local-media")?.appendChild(trackDom);
+    });
   }
 
   // Detach the Tracks from the DOM.
@@ -185,6 +168,7 @@ const IncomingVideoComponent: React.FunctionComponent<
 
     // add existing participant tracks
     room.participants.forEach((participant: any) => {
+      console.log(participant);
       console.log(
         `IncomingVideoComponent: ${participant.identity} is already in the room}`
       );
@@ -272,30 +256,6 @@ const IncomingVideoComponent: React.FunctionComponent<
     }
   }
 
-  // TODO: screenshare needs to be looked at in depth
-  /*function getScreenShare() {
-    if (navigator.mediaDevices) { // supported by Chrome (72+), Firefox (66+), Safari (12.2+)
-      return navigator.mediaDevices.getDisplayMedia({ video: true });
-    } else {
-      return navigator.mediaDevices.getUserMedia({
-        video: { mediaSource: 'screen' },
-      });
-    }
-  }
-
-  function screenShareOn() {
-    getScreenShare().then((stream: any) => {
-      let screenTrack = stream.getVideoTracks()[0];
-      activeRoom.localParticipant.publishTrack(screenTrack, { name: `screen-${Date.now()}` });
-      setScreenTrack(screenTrack);
-    });
-  }
-
-  function screenShareOff() {
-    activeRoom?.localParticipant.unpublishTrack(screenTrack);
-    setScreenTrack(null);
-  }*/
-
   let containerStyle = inSupervisor
     ? supervisorContainerStyle
     : taskContainerStyle;
@@ -305,121 +265,121 @@ const IncomingVideoComponent: React.FunctionComponent<
     return (
       <Theme.Provider theme="default">
         {activeRoom ? (
-          <FlexPaste vertical>
-            {/* <div style={containerStyle}> */}
+          <FlexPaste vertical width={"100%"}>
+            <Box width="100%" position={"absolute"} left={0}>
+              <FlexPaste vertical hAlignContent="center" width={"100%"}>
+                <div id="remote-media" style={mediaTrackContainer}>
+                  <FlexPaste
+                    padding={"space20"}
+                    width={"100%"}
+                    hAlignContent="center"
+                    marginTop="space10"
+                  >
+                    <Heading as="h3" variant="heading30" marginBottom="space0">
+                      Remote Participant
+                    </Heading>
+                  </FlexPaste>
+                </div>
 
-            <FlexPaste vertical hAlignContent="center" width={"100%"}>
-              <div id="remote-media" style={mediaTrackContainer}></div>
-              <div style={btnRow}>
-                <div style={btnContainer}>
-                  <Tooltip text="Disconnect" placement="top">
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      style={btn}
-                      onClick={disconnect}
+                <div style={btnRow}>
+                  {audioEnabled ? (
+                    <div style={btnContainer}>
+                      <Tooltip text="Mute" placement="top">
+                        <Button
+                          variant="primary"
+                          size="icon"
+                          style={btn}
+                          onClick={mute}
+                        >
+                          <MicrophoneOnIcon decorative={false} title="Mute" />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <div style={btnContainer}>
+                      <Tooltip text="Unmute" placement="top">
+                        <Button
+                          variant="primary"
+                          size="icon"
+                          style={btn}
+                          onClick={unMute}
+                        >
+                          <MicrophoneOffIcon
+                            decorative={false}
+                            title="Unmute"
+                          />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  )}
+                  {videoEnabled ? (
+                    <div style={btnContainer}>
+                      <Tooltip text="Stop Camera" placement="top">
+                        <Button
+                          variant="primary"
+                          size="icon"
+                          style={btn}
+                          onClick={videoOff}
+                        >
+                          <VideoOnIcon decorative={false} title="Stop Camera" />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <div style={btnContainer}>
+                      <Tooltip text="Start Camera" placement="top">
+                        <Button
+                          variant="primary"
+                          size="icon"
+                          style={btn}
+                          onClick={videoOn}
+                        >
+                          <VideoOffIcon
+                            decorative={false}
+                            title="Start Camera"
+                          />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  )}
+                  <div style={btnContainer}>
+                    <Tooltip text="Disconnect" placement="top">
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        style={btn}
+                        onClick={disconnect}
+                      >
+                        <CloseIcon decorative={false} title="Disconnect" />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </div>
+
+                <FlexPaste hAlignContent={"center"} width={"100%"}>
+                  <div id="local-media">
+                    <FlexPaste
+                      padding={"space20"}
+                      width={"100%"}
+                      hAlignContent="center"
                     >
-                      <CloseIcon decorative={false} title="Disconnect" />
-                    </Button>
-                  </Tooltip>
-                </div>
-                {/*screenTrack && screenTrack.isEnabled ? (
-                <div style={btnContainer}>
-                  <Tooltip text="Stop Screenshare" placement="top">
-                    <IconButton
-                      icon={<StopScreenShareIcon />}
-                      style={btn}
-                      onClick={this.screenShareOff.bind(this)}
-                    />
-                  </Tooltip>
-                </div>
-              ) : (
-                <div style={btnContainer}>
-                  <Tooltip text="Start Screenshare" placement="top">
-                    <IconButton
-                      icon={<ScreenShareIcon />}
-                      style={btn}
-                      onClick={this.screenShareOn.bind(this)}
-                    />
-                  </Tooltip>
-                </div>
-              )*/}
-                {audioEnabled ? (
-                  <div style={btnContainer}>
-                    <Tooltip text="Mute" placement="top">
-                      <Button
-                        variant="primary"
-                        size="icon"
-                        style={btn}
-                        onClick={mute}
+                      <Heading
+                        as="h6"
+                        variant="heading40"
+                        marginBottom="space0"
                       >
-                        <MicrophoneOnIcon decorative={false} title="Mute" />
-                      </Button>
-                    </Tooltip>
+                        Local Participant
+                      </Heading>
+                    </FlexPaste>
                   </div>
-                ) : (
-                  <div style={btnContainer}>
-                    <Tooltip text="Unmute" placement="top">
-                      <Button
-                        variant="primary"
-                        size="icon"
-                        style={btn}
-                        onClick={unMute}
-                      >
-                        <MicrophoneOffIcon decorative={false} title="Unmute" />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                )}
-                {videoEnabled ? (
-                  <div style={btnContainer}>
-                    <Tooltip text="Stop Camera" placement="top">
-                      <Button
-                        variant="primary"
-                        size="icon"
-                        style={btn}
-                        onClick={videoOff}
-                      >
-                        <VideoOnIcon decorative={false} title="Stop Camera" />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                ) : (
-                  <div style={btnContainer}>
-                    <Tooltip text="Start Camera" placement="top">
-                      <Button
-                        variant="primary"
-                        size="icon"
-                        style={btn}
-                        onClick={videoOn}
-                      >
-                        <VideoOffIcon decorative={false} title="Start Camera" />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                )}
-              </div>
-              <div id="local-media" style={mediaTrackContainer}></div>
-            </FlexPaste>
-
-            {/* {VIDEO_APP_URL ? (
-              <div style={btnVideoAppRow}>
-                <Button
-                  style={btnVideoApp}
-                  //onClick={openVideoApp}
-                  variant="primary"
-                >
-                  Pop Out
-                  <LinkExternalIcon decorative={true} style={btnVideoAppIcon} />
-                </Button>
-              </div>
-            ) : null} */}
-            {/* </div> */}
+                </FlexPaste>
+              </FlexPaste>
+            </Box>
           </FlexPaste>
         ) : (
           <div style={containerStyle}>
             {connecting ? (
-              <p>Connecting...</p>
+              <FlexPaste padding="space50">Connecting...</FlexPaste>
             ) : (
               <FlexPaste padding="space50">
                 <Button variant="primary" onClick={connectVideo}>

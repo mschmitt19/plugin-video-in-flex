@@ -65,11 +65,13 @@ function connect_video() {
       if (response.error) {
         throw response.error;
       }
+      token = response.token;
       return Video.connect(response.token);
     })
     .then(
       (room) => {
         video_room = room;
+        console.log("room", room);
         display_joined_room(room);
         console.log(`Successfully joined a Room: ${room}`);
         const localParticipant = room.localParticipant;
@@ -77,22 +79,75 @@ function connect_video() {
           `Connected to the Room as LocalParticipant "${localParticipant.identity}"`
         );
 
+        const muteButton = document.getElementById("muteToggle");
+        muteButton.onclick = function () {
+          console.log(room);
+          Array.from(room.localParticipant.tracks.values()).forEach((track) => {
+            if (track.kind === "audio") {
+              console.log(track);
+              if (track.isTrackEnabled) {
+                track.track.disable();
+                muteButton.innerHTML = "Unmute";
+              } else {
+                track.track.enable();
+                muteButton.innerHTML = "Mute";
+              }
+            }
+          });
+        };
+
+        const videoButton = document.getElementById("videoToggle");
+        videoButton.onclick = function () {
+          Array.from(room.localParticipant.tracks.values()).forEach((track) => {
+            if (track.kind === "video") {
+              console.log(track);
+              if (track.isTrackEnabled) {
+                track.track.disable();
+                videoButton.innerHTML = "Turn Video On";
+              } else {
+                track.track.enable();
+                videoButton.innerHTML = "Turn Video Off";
+              }
+            }
+          });
+        };
+
+        const screenShareButton = document.getElementById("screenShare");
+        let screenTrack = null;
+        screenShareButton.onclick = async function () {
+          if (!screenTrack) {
+            navigator.mediaDevices
+              .getDisplayMedia()
+              .then((stream) => {
+                screenTrack = new Twilio.Video.LocalVideoTrack(
+                  stream.getTracks()[0]
+                );
+                screenShareButton.innerHTML = "Stop Sharing Screen";
+                room.localParticipant.publishTrack(screenTrack);
+              })
+              .catch(() => {
+                screenShareButton.innerHTML = "Share Screen";
+                alert("Could not share the screen.");
+              });
+          } else {
+            room.localParticipant.unpublishTrack(screenTrack);
+            screenTrack.stop();
+            screenTrack = null;
+            screenShareButton.innerHTML = "Share Screen";
+          }
+        };
+
+        const disconnectButton = document.getElementById("disconnect");
+        disconnectButton.onclick = function () {
+          room.disconnect();
+        };
+
         room.localParticipant.on("trackEnabled", (track) => {
           console.log("enabled", track);
-          if (track === this.state.localAudio) {
-            this.setState({ audioEnabled: true });
-          } else if (track === this.state.localVideo) {
-            this.setState({ videoEnabled: true });
-          }
         });
 
         room.localParticipant.on("trackDisabled", (track) => {
           console.log("disabled", track);
-          if (track === this.state.localAudio) {
-            this.setState({ audioEnabled: false });
-          } else if (track === this.state.localVideo) {
-            this.setState({ videoEnabled: false });
-          }
         });
 
         const remoteMedia = document.getElementById("remote-media-div");

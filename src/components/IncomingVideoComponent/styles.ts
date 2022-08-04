@@ -1,6 +1,5 @@
 export const taskContainerStyle = {
   display: "flex",
-  //flexDirection: "column",
   justifyContext: "space-between",
   paddingLeft: 0,
   width: "100%",
@@ -9,11 +8,10 @@ export const taskContainerStyle = {
 };
 
 export const mediaTrackContainer = {
-  //width: "auto",
-  //height: "30vh",
-  width: "auto",
+  width: "100%",
   justifyContent: "center",
   alignContent: "center",
+  testAlign: "center",
 };
 
 export const supervisorContainerStyle = {
@@ -41,6 +39,8 @@ export const btnRow = {
   maxHeight: 80,
   display: "flex",
   justifyContent: "center",
+  marginTop: 10,
+  marginBottom: 10,
 };
 
 export const btnVideoAppRow = {
