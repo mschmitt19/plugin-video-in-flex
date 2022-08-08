@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { withTaskContext } from "@twilio/flex-ui";
 import Video from "twilio-video";
 import { Button } from "@twilio-paste/core/button";
@@ -18,25 +18,19 @@ import {
   btn,
   btnContainer,
   btnRow,
-  btnVideoApp,
-  btnVideoAppIcon,
-  btnVideoAppRow,
   mediaTrackContainer,
-  supervisorContainerStyle,
   taskContainerStyle,
 } from "./styles";
 
 interface IncomingVideoComponentProps {
   task?: any;
   manager: any;
-  inSupervisor: boolean;
 }
 const BACKEND_URL = process.env.REACT_APP_VIDEO_APP_URL;
-const VIDEO_APP_URL = process.env.REACT_APP_VIDEO_APP_URL;
 
 const IncomingVideoComponent: React.FunctionComponent<
   IncomingVideoComponentProps
-> = ({ task, manager, inSupervisor }) => {
+> = ({ task, manager }) => {
   const [connecting, setConnecting] = useState(false);
   const [activeRoom, setActiveRoom] = useState<Video.Room | null>(null);
   const [screenTrack, setScreenTrack] = useState<Video.Track | null>(null);
@@ -60,9 +54,6 @@ const IncomingVideoComponent: React.FunctionComponent<
   }, []);
 
   function connectVideo() {
-    console.log("task", task);
-    console.log("task.attributes", task.attributes);
-    console.log("task.attributes.syncDocument", task.attributes.syncDocument);
     if (task && task.attributes && task.attributes.syncDocument) {
       setConnecting(true);
       const body = {
@@ -256,9 +247,7 @@ const IncomingVideoComponent: React.FunctionComponent<
     }
   }
 
-  let containerStyle = inSupervisor
-    ? supervisorContainerStyle
-    : taskContainerStyle;
+  let containerStyle = taskContainerStyle;
 
   if (!task) return null;
   else {

@@ -1,26 +1,20 @@
 import React, { useState } from "react";
-import { Actions, Manager, TaskContext } from "@twilio/flex-ui";
-import * as Flex from "@twilio/flex-ui";
+import { Actions, TaskContext } from "@twilio/flex-ui";
 import { Flex as FlexComponent } from "@twilio-paste/core/flex";
 import { Button } from "@twilio-paste/core/button";
 import { Theme } from "@twilio-paste/core/theme";
 import { VideoOnIcon } from "@twilio-paste/icons/esm/VideoOnIcon";
 
 interface SwitchToVideoProps {
-  flex: any;
   task?: any;
 }
 
 const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
-  flex,
   task,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  //   console.log(flex);
-  //   console.log(task._task);
+
   const onClick = async (channelSid: string | undefined, context: any) => {
-    // console.log(channelSid);
-    // console.log(context);
     setIsLoading(true);
     console.log("video button clicked", process.env.REACT_APP_VIDEO_APP_URL);
     const taskSid = context.task._task.sid;
@@ -33,7 +27,6 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
       .then((response) => response.json())
       .then((response) => {
         console.log("SwitchToVideo: unique link created:", response);
-        console.log(task.attributes);
         return Actions.invokeAction("SendMessage", {
           body: `Please join me using this unique video link: ${response.full_url}`,
           conversationSid: channelSid,

@@ -24,16 +24,15 @@ export default class TwilioVideoInFlexPlugin extends FlexPlugin {
       if: (props: any) => props.task.attributes.videoRoom === "created",
     };
 
+    // add the Video Room tab to the chat conversation
     flex.TaskCanvasTabs.Content.add(
       <Flex.Tab label="Video Room" key="IncomingVideoComponent">
-        <IncomingVideoComponent manager={manager} inSupervisor={false} />
+        <IncomingVideoComponent manager={manager} />
       </Flex.Tab>,
       incomingVideoOptions
     );
 
     // add the Agent "switch to video" button
-    flex.TaskCanvasHeader.Content.add(
-      <SwitchToVideo key="video" flex={flex} />
-    );
+    flex.TaskCanvasHeader.Content.add(<SwitchToVideo key="video" />);
   }
 }
