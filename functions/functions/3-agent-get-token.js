@@ -67,15 +67,6 @@ exports.handler = TokenValidator(async function (context, event, callback) {
   // We use the agent's FLEX identity
   const agent_identity = event.TokenResult.identity;
 
-  // We give the agent read-only rights to the SYNC document
-  // Note: not used today, but here just to show what it would look like!
-  // client.sync
-  //   .services(context.SYNC_SERVICE_SID)
-  //   .documents(document_sid)
-  //   .documentPermissions(agent_identity)
-  //   .update({ read: true, write: false, manage: false })
-  //   .then((document_permission) => console.log(document_permission.serviceSid));
-
   // Authorize the agent Frontend to connect to SYNC
   // Note: not used today, but here just to show what it would look like!
   const syncGrant = new SyncGrant({

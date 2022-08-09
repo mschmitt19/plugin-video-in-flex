@@ -60,7 +60,7 @@ exports.handler = async (context, event, callback) => {
   });
   token.addGrant(videoGrant);
 
-  // The task has been created, we respond to the client with his identity and his token
+  // We respond to the client with his identity and his token
   // With those the Frontend JS can subscribe to the SYNC document and get notified when the agent connects.
   response.setBody({ token: token.toJwt() });
   return callback(null, response);
