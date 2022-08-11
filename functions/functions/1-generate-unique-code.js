@@ -10,12 +10,11 @@ exports.handler = async (context, event, callback) => {
   response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
   response.appendHeader("Content-Type", "application/json");
 
-  // Note: we don't create the video room yet, because it has only a 5-min TTL if no one connects to it.
-  // const video_room_name = randomstring.generate();
-
-  // Generate a short unique id for the client-facing url
-  // We create a SYNC document to store the data about this request.
-  // The unique code is also the unique name of the document so it's easy to find later on.
+  /* 
+    - Generate a short unique id for the client-facing url
+    - Create a SYNC document to store the data about this request
+    - The unique code is also the unique name of the document so it's easy to find later on. 
+  */
   let unique_code = "";
   let document = null;
   while (!document) {

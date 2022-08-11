@@ -42,7 +42,7 @@ exports.handler = TokenValidator(async function (context, event, callback) {
       .create({
         recordParticipantsOnConnect: context.VIDEO_RECORD_BY_DEFAULT,
         type: context.VIDEO_ROOM_TYPE,
-        statusCallback: `https://${context.DOMAIN_NAME}/callback/video-room?document=${document.sid}`, // Will be used to update the SYNC document if/when the room is deleted.
+        statusCallback: `https://${context.DOMAIN_NAME}/callback/video-room?document=${document.sid}`,
       })
       .then((room) => {
         room_name = room.sid;
@@ -67,8 +67,10 @@ exports.handler = TokenValidator(async function (context, event, callback) {
   // We use the agent's FLEX identity
   const agent_identity = event.TokenResult.identity;
 
-  // Authorize the agent Frontend to connect to SYNC
-  // Note: not used today, but here just to show what it would look like!
+  /*
+    - Authorize the agent Frontend to connect to SYNC
+    - Note: not  directly utilized in this implementation
+  */
   const syncGrant = new SyncGrant({
     serviceSid: context.SYNC_SERVICE_SID,
   });

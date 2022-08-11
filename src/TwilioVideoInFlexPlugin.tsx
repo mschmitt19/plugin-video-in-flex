@@ -21,7 +21,7 @@ export default class TwilioVideoInFlexPlugin extends FlexPlugin {
   async init(flex: typeof Flex, manager: Flex.Manager): Promise<void> {
     const incomingVideoOptions = {
       sortOrder: 10,
-      if: (props: any) => props.task.attributes.videoRoom === "created",
+      if: (props: any) => props.task.attributes.videoRoom !== undefined,
     };
 
     // add the Video Room tab to the chat conversation
@@ -34,5 +34,29 @@ export default class TwilioVideoInFlexPlugin extends FlexPlugin {
 
     // add the Agent "switch to video" button
     flex.TaskCanvasHeader.Content.add(<SwitchToVideo key="video" />);
+
+    // add listener before task completion if it included video to check if the agent is still in the room
+    // an alternative to this strategy would be to set the room status to "completed" on task completion to
+    // ensure all participants are disconnected from the room
+    flex.Actions.addListener(
+      "beforeCompleteTask",
+      async (payload, cancelActionInvocation) => {
+        const { videoRoom } = payload.task.attributes;
+
+        if (!Flex.TaskHelper.isChatBasedTask(payload.task) || !videoRoom) {
+          console.log("not a chat task or didn't have video element");
+          return payload;
+        }
+
+        if (videoRoom === "connected") {
+          alert(
+            "You are still connected to a video room. Please disconnect before completing the task."
+          );
+          cancelActionInvocation();
+        }
+
+        return payload;
+      }
+    );
   }
 }

@@ -4,6 +4,7 @@ import { Flex as FlexComponent } from "@twilio-paste/core/flex";
 import { Button } from "@twilio-paste/core/button";
 import { Theme } from "@twilio-paste/core/theme";
 import { VideoOnIcon } from "@twilio-paste/icons/esm/VideoOnIcon";
+import { updateTaskAttributesForVideo } from "../../shared/utils";
 
 interface SwitchToVideoProps {
   task?: any;
@@ -16,11 +17,8 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
 
   const onClick = async (channelSid: string | undefined, context: any) => {
     setIsLoading(true);
-    console.log("video button clicked", process.env.REACT_APP_VIDEO_APP_URL);
     const taskSid = context.task._task.sid;
-    const taskAttributes = context.task._task.attributes;
-    console.log("taskSid", taskSid);
-    console.log("taskAttributes", taskAttributes);
+
     fetch(
       `${process.env.REACT_APP_VIDEO_APP_URL}/1-generate-unique-code?taskSid=${taskSid}`
     )
@@ -36,11 +34,7 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
         setIsLoading(false);
       });
 
-    let attributes = task.attributes;
-    let updatedAttributes = Object.assign(attributes, {
-      videoRoom: "created",
-    });
-    task.setAttributes(updatedAttributes);
+    updateTaskAttributesForVideo(task, "created");
   };
 
   return (

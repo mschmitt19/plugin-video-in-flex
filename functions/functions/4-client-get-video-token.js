@@ -42,8 +42,10 @@ exports.handler = async (context, event, callback) => {
     return callback(null, response);
   }
 
-  // Generate a random identity for the customer.
-  // This could also be a name we ask him to provide in a form.
+  /*
+    - Generate a random identity for the customer
+    - Note: could be replaced with additional data passed to the function
+  */
   const client_identity = randomstring.generate();
 
   // Create an access token which we will sign and return to the client,
@@ -60,8 +62,10 @@ exports.handler = async (context, event, callback) => {
   });
   token.addGrant(videoGrant);
 
-  // We respond to the client with his identity and his token
-  // With those the Frontend JS can subscribe to the SYNC document and get notified when the agent connects.
+  /*
+    - Respond to the client with identity and token
+    - Frontend JS can subscribe to the SYNC document and get notified when the agent connects
+  */
   response.setBody({ token: token.toJwt() });
   return callback(null, response);
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { withTaskContext } from "@twilio/flex-ui";
 import Video from "twilio-video";
 import { Button } from "@twilio-paste/core/button";
@@ -21,6 +21,12 @@ import {
   mediaTrackContainer,
   taskContainerStyle,
 } from "./styles";
+import {
+  attachLocalTracks,
+  attachRemoteTracks,
+  detachTracks,
+  updateTaskAttributesForVideo,
+} from "../../shared/utils";
 
 interface IncomingVideoComponentProps {
   task?: any;
@@ -33,7 +39,6 @@ const IncomingVideoComponent: React.FunctionComponent<
 > = ({ task, manager }) => {
   const [connecting, setConnecting] = useState(false);
   const [activeRoom, setActiveRoom] = useState<Video.Room | null>(null);
-  const [screenTrack, setScreenTrack] = useState<Video.Track | null>(null);
   const [localAudio, setLocalAudio] = useState<Video.LocalAudioTrack | null>(
     null
   );
@@ -42,16 +47,6 @@ const IncomingVideoComponent: React.FunctionComponent<
   );
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
-
-  const remoteMediaDiv = useRef();
-
-  useEffect(() => {
-    console.log("IncomingVideoComponent: useEffect");
-    if (!activeRoom && !connecting) {
-      console.log("IncomingVideoComponent: Should connect to Video Room");
-      //connectVideo();
-    }
-  }, []);
 
   function connectVideo() {
     if (task && task.attributes && task.attributes.syncDocument) {
@@ -75,6 +70,7 @@ const IncomingVideoComponent: React.FunctionComponent<
         })
         .then(roomJoined)
         .catch((err) => {
+          updateTaskAttributesForVideo(task, "error");
           alert(`Error joining video: ${err.message}`);
         })
         .finally(() => {
@@ -87,42 +83,10 @@ const IncomingVideoComponent: React.FunctionComponent<
     }
   }
 
-  // Attach the Remote Tracks to the DOM.
-  function attachTracks(tracks: any, container: any) {
-    tracks.forEach(function (track: any) {
-      if (track.track) track = track.track;
-      if (!track.attach) return;
-      let trackDom = track.attach();
-      trackDom.style.width = "100%";
-      trackDom.style["max-height"] = "100%";
-      document.getElementById("remote-media")?.appendChild(trackDom);
-    });
-  }
-
-  function attachLocalTracks(tracks: any, container: any) {
-    tracks.forEach(function (track: any) {
-      if (track.track) track = track.track;
-      let trackDom = track.attach();
-      trackDom.style.maxWidth = "100%";
-      trackDom.style["height"] = "200px";
-      document.getElementById("local-media")?.appendChild(trackDom);
-    });
-  }
-
-  // Detach the Tracks from the DOM.
-  function detachTracks(tracks: any) {
-    tracks.forEach(function (track: any) {
-      if (track.track) track = track.track;
-      if (!track.detach) return;
-      track.detach().forEach(function (detachedElement: any) {
-        detachedElement.remove();
-      });
-    });
-  }
-
   function roomJoined(room: any) {
     console.log("IncomingVideoComponent: room joined: ", room);
     setActiveRoom(room);
+    updateTaskAttributesForVideo(task, "connected");
 
     // Save the local audio/video tracks in state so we can easily mute later
     Array.from(room.localParticipant.tracks.values()).forEach((track: any) => {
@@ -136,7 +100,7 @@ const IncomingVideoComponent: React.FunctionComponent<
     // add local tracks to the screen
     attachLocalTracks(
       Array.from(room.localParticipant.tracks.values()),
-      remoteMediaDiv
+      "local-media"
     );
 
     room.localParticipant.on("trackEnabled", (track: any) => {
@@ -164,7 +128,7 @@ const IncomingVideoComponent: React.FunctionComponent<
         `IncomingVideoComponent: ${participant.identity} is already in the room}`
       );
       const tracks = Array.from(participant.tracks.values());
-      attachTracks(tracks, remoteMediaDiv);
+      attachRemoteTracks(tracks, "remote-media");
     });
 
     // When a Participant joins the Room
@@ -181,7 +145,7 @@ const IncomingVideoComponent: React.FunctionComponent<
         console.log(
           `IncomingVideoComponent: ${participant.identity} added track: ${track.kind}`
         );
-        attachTracks([track], remoteMediaDiv);
+        attachRemoteTracks([track], "remote-media");
       }
     );
 
@@ -241,13 +205,10 @@ const IncomingVideoComponent: React.FunctionComponent<
   function disconnect() {
     if (activeRoom) {
       activeRoom.disconnect();
-      // TODO: bind in clearVideo functionality from state management
-      //this.props.clearVideo();
       setActiveRoom(null);
+      updateTaskAttributesForVideo(task, "disconnected");
     }
   }
-
-  let containerStyle = taskContainerStyle;
 
   if (!task) return null;
   else {
@@ -366,7 +327,7 @@ const IncomingVideoComponent: React.FunctionComponent<
             </Box>
           </FlexPaste>
         ) : (
-          <div style={containerStyle}>
+          <div style={taskContainerStyle}>
             {connecting ? (
               <FlexPaste padding="space50">Connecting...</FlexPaste>
             ) : (
