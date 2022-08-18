@@ -62,7 +62,7 @@ const IncomingVideoComponent: React.FunctionComponent<
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
         },
       };
-      fetch(`${BACKEND_URL}/3-agent-get-token`, options)
+      fetch(`${BACKEND_URL}/agent-get-token`, options)
         .then((res) => res.json())
         .then((res) => {
           console.log("IncomingVideoComponent: got token: ", res.token);

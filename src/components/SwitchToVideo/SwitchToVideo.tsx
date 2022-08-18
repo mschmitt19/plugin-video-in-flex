@@ -20,7 +20,7 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
     const taskSid = context.task._task.sid;
 
     fetch(
-      `${process.env.REACT_APP_VIDEO_APP_URL}/1-generate-unique-code?taskSid=${taskSid}`
+      `${process.env.REACT_APP_VIDEO_APP_URL}/generate-unique-code?taskSid=${taskSid}`
     )
       .then((response) => response.json())
       .then((response) => {
@@ -28,6 +28,11 @@ const SwitchToVideo: React.FunctionComponent<SwitchToVideoProps> = ({
         return Actions.invokeAction("SendMessage", {
           body: `Please join me using this unique video link: ${response.full_url}`,
           conversationSid: channelSid,
+          messageAttributes: {
+            hasVideo: true,
+            videoUrl: response.full_url,
+            uniqueCode: response.unique_code,
+          },
         });
       })
       .finally(() => {

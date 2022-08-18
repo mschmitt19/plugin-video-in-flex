@@ -6,7 +6,7 @@ let video_room = null;
 
 function connect_sync() {
   // Obtain a JWT access token
-  fetch(`/2-client-get-sync-token?code=${code}`)
+  fetch(`/client-get-sync-token?code=${code}`)
     .then((response) => response.json())
     .then((response) => {
       if (response.error) {
@@ -17,7 +17,6 @@ function connect_sync() {
     .then((client) => client.document(code))
     .then((document) => {
       console.log("Code Validated. Sync document SID:", document.sid);
-      display_code_valid(true);
       process_sync_data_update(document.data);
       document.on("updated", (event) => {
         console.log('Received an "updated" Sync Document event: ', event);
@@ -25,13 +24,11 @@ function connect_sync() {
       });
     })
     .catch((error) => {
-      display_code_valid(false);
       console.error("Unexpected error", error);
     });
 }
 
 function process_sync_data_update(data) {
-  display_task_created(data.task);
   if (!video_room && data.room) connect_video();
 }
 
@@ -59,7 +56,7 @@ function detachTracks(tracks) {
 
 function connect_video() {
   // Obtain a JWT access token
-  fetch(`/4-client-get-video-token?code=${code}`)
+  fetch(`/client-get-video-token?code=${code}`)
     .then((response) => response.json())
     .then((response) => {
       if (response.error) {
@@ -72,7 +69,6 @@ function connect_video() {
       (room) => {
         video_room = room;
         console.log("room", room);
-        display_joined_room(room);
         console.log(`Successfully joined a Room: ${room}`);
         const localParticipant = room.localParticipant;
         console.log(
@@ -209,12 +205,6 @@ function connect_video() {
       console.error("Unexpected error", error);
     });
 }
-
-function display_code_valid(valid) {}
-
-function display_task_created(task_sid) {}
-
-function display_joined_room(room) {}
 
 $(document).ready(function () {
   code = getUrlParameter("code");
