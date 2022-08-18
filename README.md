@@ -2,9 +2,38 @@
 <img  src="https://static0.twilio.com/marketing/bundles/marketing/img/logos/wordmark-red.svg"  alt="Twilio"  width="250"  />
 </a>
 
-# Agent Escalated Video Chat in Flex Plugin
+# Chat to Video Escalation in Flex Plugin
 
 This Flex Plugin shows how an agent can initiate a video room from a webchat conversation within Flex. This plugin was built for **Flex 2.0**.
+
+---
+
+## Functionality Overview
+
+### Technical Components
+
+- **Twilio Serverless Functions** - used to orchestrate the API requests to generate access tokens
+- **Twilio Serverless Assets** - used to host the customer-side video room UI
+- **Twilio Sync** - utilized as the source of truth to store information about the video room and requests
+- **Twilio Video JS** - used for connecting and monitoring the video rooms on the client side
+
+### Escalating Chat to Video
+
+The following diagram demonstrates how a chat session can be escalated to video. More specifically, this flow outlines the technical details from agent initiation to connecting to the video room.
+
+Component coloring key:
+
+- _purple_ - Agent related, within the Flex plugin
+- _red_ - Twilio Functions & Assets
+- _blue_ - Customer side
+
+<img  src="./readme_assets/Chat-to-Video-Diagram.png"  alt="Twilio"  width="100%"  />
+
+### Video Room JS SDK Events
+
+The next diagram outlines high-level operations that need to be considered when implementing a video room experience, specifically the different types of events that need to be handled as relating to the Room and Participants.
+
+<img  src="./readme_assets/VideoRoom-JS-SDK-Flow-Events.png"  alt="Twilio"  width="100%"  />
 
 ---
 
