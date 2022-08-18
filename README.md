@@ -195,6 +195,10 @@ You are all set to test the plugin on your Flex application!
 
 - Updated README and pushed code.
 
+## Reference
+
+This plugin was created & inspired by a pre-existing solution located in [this repo](https://github.com/jlbrs/Twilio-Video-in-Twilio-Flex), for reference.
+
 ## Disclaimer
 
 This software is to be considered "sample code", a Type B Deliverable, and is delivered "as-is" to the user. Twilio bears no responsibility to support the use or implementation of this software.
