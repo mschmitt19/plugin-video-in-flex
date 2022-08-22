@@ -21,12 +21,6 @@ This Flex Plugin shows how an agent can initiate a video room from a webchat con
 
 The following diagram demonstrates how a chat session can be escalated to video. More specifically, this flow outlines the technical details from agent initiation to connecting to the video room.
 
-Component coloring key:
-
-- _purple_ - Agent related, within the Flex plugin
-- _red_ - Twilio Functions & Assets
-- _blue_ - Customer side
-
 <img  src="./readme_assets/Chat-to-Video-Diagram.png"  alt="Twilio"  width="100%"  />
 
 ### Video Room JS SDK Events
@@ -178,6 +172,10 @@ You need to modify the source file to mention the serverless domain of the funct
    ```bash
    twilio flex:plugins:deploy --major --changelog "Initial Agent Video Escalation on Web Chat" --description "Agent Video Escalation"
    ```
+
+### Testing with Web Chat
+
+To test this functionality locally with Flex 2.0, clone the [Twilio Flex Web Chat UI Sample](https://github.com/twilio/flex-webchat-ui-sample) React app.
 
 ## View your plugin in the Plugins Dashboard
 
