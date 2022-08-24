@@ -175,7 +175,7 @@ You need to modify the source file to mention the serverless domain of the funct
 
 ### Testing with Web Chat
 
-To test this functionality locally with Flex 2.0, clone the [Twilio Flex Web Chat UI Sample](https://github.com/twilio/flex-webchat-ui-sample) React app.
+To test this functionality locally with Flex 2.0, clone the [Twilio Flex Web Chat React Sample](https://github.com/twilio/twilio-webchat-react-app) web app.
 
 ## View your plugin in the Plugins Dashboard
 
