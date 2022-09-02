@@ -57,7 +57,7 @@ exports.handler = async (context, event, callback) => {
   response.setBody({
     unique_code: unique_code,
     valid_until: document.dateExpires,
-    full_url: `https://${context.DOMAIN_NAME}/video.html?code=${unique_code}`,
+    full_url: `https://${context.DOMAIN_NAME}/index.html?code=${unique_code}`,
   });
 
   callback(null, response);

@@ -8,7 +8,43 @@ This Flex Plugin shows how an agent can initiate a video room from a webchat con
 
 ---
 
+1. [Functionality Overview](#functionality-overview)
+   1. [Project Structure](#project-structure)
+   1. [Technical Components](#technical-components)
+   1. [Example Walkthrough](#example-walkthrough)
+   1. [Escalating Chat to Video](#escalating-chat-to-video)
+   1. [Video Room JS SDK Events](#video-room-js-sdk-events)
+2. [Setup](#setup)
+   1. [Requirements](#requirements)
+   2. [Twilio Account Settings](#twilio-account-settings)
+3. [Local Development](#local-development)
+   1. [Twilio Serverless Deployment](#twilio-serverless-deployment)
+   2. [Pre-deployment Steps](#pre-deployment-steps)
+   3. [Flex Plugin Deployment](#flex-plugin-deployment)
+   4. [Testing with Web Chat](#testing-with-web-chat)
+   5. [View your plugin in the Plugins Dashboard](#view-your-plugin-in-the-plugins-dashboard)
+4. [Changelog](#changelog)
+5. [Reference](#reference)
+6. [Disclaimer](#disclaimer)
+
+---
+
 ## Functionality Overview
+
+### Project Structure
+
+The project structure is broken down into three sections:
+
+- **Flex Plugin** - starting at the root of the directory:
+  - The `./src` folder contains the custom components, async logic to make requests to the `Twilio Function`, and helper functions
+  - Key highlights of the Flex Plugin UI are encompassed in the components, found at `./src/components`
+- **Twilio Serverless** - within the `./functions` directory:
+  - This houses the Twilio Functions & Assets
+  - The function paths (`./functions/functions`) orchestrate the facilitation of access token generation, sync document management, and video room creation
+  - The assets are utilized to host the build output of the customer-facing web application that joins the customer into the video session, ultimately connecting them to the agent; for further details on how this application works, see the [./video-app-quickstart](./video-app-quickstart/) folder
+- **Customer Facing Video App** - within the `./video-app-quickstart` directory:
+  - A Next JS application built with React, TypeScript, and Twilio Paste design system
+  - This application is used by the customer to connect to the video session
 
 ### Technical Components
 
@@ -16,6 +52,38 @@ This Flex Plugin shows how an agent can initiate a video room from a webchat con
 - **Twilio Serverless Assets** - used to host the customer-side video room UI
 - **Twilio Sync** - utilized as the source of truth to store information about the video room and requests
 - **Twilio Video JS** - used for connecting and monitoring the video rooms on the client side
+
+### Example Walkthrough
+
+1. The video session can only be initiated by the Agent within Flex. Once determined a video session would be appropriate to resolve the customer's use case, the Agent clicks the `Video Icon` button in the `Task Canvas Header`:
+
+   <img  src="./readme_assets/video-button.png"  alt="Twilio"  width="50%"  />
+
+2. After clicking the button, a request is sent to the Twilio function to generate a unique code, which serves as the video room name. Upon success, the unique code and full url to join the video session are returned to the Flex UI, which then auto-sends a message to the conversation with the customer:
+
+   <img  src="./readme_assets/join-video-message.png"  alt="Twilio"  width="20%"  />
+
+3. Within the Flex UI, a new tab is visible to the Agent within the `Task Canvas Tabs`, labeled `Video Room`:
+
+   <img  src="./readme_assets/join-room-button.png"  alt="Twilio"  width="50%"  />
+
+4. After clicking `Join Video Room`, the agent is connected to the video room and can interact with the customer:
+
+   <img  src="./readme_assets/agent-video-room.png"  alt="Twilio"  width="50%"  />
+
+5. On the customer's end, they would click the link included in the message, which would open a new browser tab to join the video room:
+
+   <img  src="./readme_assets/customer-video-join.png"  alt="Twilio"  width="50%"  />
+
+6. After clicking `Join Video Room`, the customer will connect to the room and interact with the Agent. The buttons below the video allow the customer to toggle their microphone and camera to on/off, share their screen, and disconnect from the video session:
+
+   <img  src="./readme_assets/customer-video-room.png"  alt="Twilio"  width="50%"  />
+
+7. Once the video session is complete and the customer disconnects from the room, there is a _Post Video UI_ where you could collect a CSAT or feedback:
+
+   <img  src="./readme_assets/post-video-room.png"  alt="Twilio"  width="50%"  />
+
+**Note:** An agent will only be able to participate in one video session at a time. Additionally, an Agent must disconnect from the video session before being allowed to complete or wrap-up a task.
 
 ### Escalating Chat to Video
 
@@ -82,15 +150,17 @@ After the above requirements have been met:
    cd public && cp appConfig.example.js appConfig.js
    ```
 
-4. [Deploy your Twilio Function](#twilio-serverless-deployment).
+4. [Configure and build the Customer Facing Video Application](./video-app-quickstart/README.md).
 
-5. Run the application.
+5. [Deploy your Twilio Function](#twilio-serverless-deployment).
+
+6. Run the application.
 
    ```bash
    twilio flex:plugins:start
    ```
 
-6. Navigate to [http://localhost:3000](http://localhost:3000).
+7. Navigate to [http://localhost:3000](http://localhost:3000).
 
 ### Twilio Serverless deployment
 
@@ -177,9 +247,9 @@ You need to modify the source file to mention the serverless domain of the funct
 
 To test this functionality locally with Flex 2.0, clone the [Twilio Flex Web Chat React Sample](https://github.com/twilio/twilio-webchat-react-app) web app.
 
-## View your plugin in the Plugins Dashboard
+### View your plugin in the Plugins Dashboard
 
-After running the suggested next step with a meaningful name and description, navigate to the [Plugins Dashboard](https://flex.twilio.com/admin/) to review your recently deployed and released plugin. Confirm that the latest version is enabled for your contact center.
+After running the deployment with a meaningful name and description, navigate to the [Plugins Dashboard](https://flex.twilio.com/admin/) to review your recently deployed and released plugin. Confirm that the latest version is enabled for your contact center.
 
 You are all set to test the plugin on your Flex application!
 
