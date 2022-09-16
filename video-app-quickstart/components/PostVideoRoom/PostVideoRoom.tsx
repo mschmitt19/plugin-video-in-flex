@@ -40,7 +40,10 @@ export default function PostVideoRoom() {
       >
         <MediaObject as="div" verticalAlign="center" marginBottom={"space40"}>
           <MediaFigure as="div" spacing="space40">
-            <img src="/twilio.png" height="40px" />
+            <img
+              src="https://hosted-assets-2838-dev.twil.io/twilio.png"
+              height="40px"
+            />
           </MediaFigure>
           <MediaBody as="div">
             <Text as="p" fontSize="fontSize70" fontWeight="fontWeightMedium">

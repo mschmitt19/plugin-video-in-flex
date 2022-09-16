@@ -42,7 +42,6 @@ exports.handler = TokenValidator(async function (context, event, callback) {
       .create({
         recordParticipantsOnConnect: context.VIDEO_RECORD_BY_DEFAULT,
         type: context.VIDEO_ROOM_TYPE,
-        statusCallback: `https://${context.DOMAIN_NAME}/callback/video-room?document=${document.sid}`,
       })
       .then((room) => {
         room_name = room.sid;
