@@ -15,7 +15,10 @@ const Home: NextPage = () => {
     <Box as="main">
       <Head>
         <title>Twilio Video Lite</title>
-        <link rel="icon" href="/twilio.png" />
+        <link
+          rel="icon"
+          href="https://hosted-assets-2838-dev.twil.io/twilio.png"
+        />
       </Head>
       {!!code ? <VideoRoom /> : <LandingPage />}
     </Box>
